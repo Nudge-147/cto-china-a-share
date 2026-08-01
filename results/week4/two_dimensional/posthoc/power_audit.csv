@@ -1,0 +1,2 @@
+test,months,observed_difference,hac_long_run_sd,hac_se,observed_nw_t,two_sided_alpha,approx_power_at_observed_effect,months_for_80pct_power_at_observed_effect,method
+attention_minus_information_Q5-Q1,168,0.006930630902600902,0.06768096763178025,0.005221700017129801,1.3272748108594803,0.05,0.26397419556304924,749,Normal approximation using the observed Newey-West(5) long-run variance; exploratory power audit

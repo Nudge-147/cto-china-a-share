@@ -1,0 +1,7 @@
+event_type,event_role,event_rows,missing_event_date,first_event_date,last_event_date
+dividend,announcement,46750,0,2010-08-16,2026-07-31
+dividend,ex_date,46131,0,2010-08-20,2026-08-07
+dividend,plan_announcement,46750,0,2010-07-07,2026-07-31
+earnings_flash,announcement,34823,0,2010-04-07,2026-07-30
+earnings_forecast,announcement,99369,0,2010-03-04,2026-07-31
+periodic_report,announcement,412923,0,2010-04-08,2026-08-01

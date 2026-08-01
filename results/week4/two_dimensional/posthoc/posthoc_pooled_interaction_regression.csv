@@ -1,0 +1,9 @@
+term,coefficient,cluster_month_se,t_stat,p_value,n_obs,n_month_clusters,specification
+const,1.7957098481791167e-18,8.812805045596347e-19,2.037614401871299,0.04158851060627413,622100,197,"POST-HOC: month-FE pooled OLS, month-clustered SE; controls log float market cap and formation-month return"
+cto_pct,0.008401388731001092,0.0013244144036630974,6.343474299104818,2.246404625830042e-10,622100,197,"POST-HOC: month-FE pooled OLS, month-clustered SE; controls log float market cap and formation-month return"
+attention,0.0031584322489759476,0.0017617348124298426,1.7927966381158886,0.073005447267548,622100,197,"POST-HOC: month-FE pooled OLS, month-clustered SE; controls log float market cap and formation-month return"
+information,0.005207656662272573,0.0016569576367412681,3.142902719296101,0.001672814246943231,622100,197,"POST-HOC: month-FE pooled OLS, month-clustered SE; controls log float market cap and formation-month return"
+attention_x_cto,0.011507445320155591,0.00425401622773045,2.7050779085285486,0.0068288371490348105,622100,197,"POST-HOC: month-FE pooled OLS, month-clustered SE; controls log float market cap and formation-month return"
+information_x_cto,-0.0056337167878338194,0.0034125374780883317,-1.6508878873880586,0.09876146957557472,622100,197,"POST-HOC: month-FE pooled OLS, month-clustered SE; controls log float market cap and formation-month return"
+log_market_cap,-0.003235424160003957,0.0012121950765031652,-2.6690622843785397,0.007606334368130814,622100,197,"POST-HOC: month-FE pooled OLS, month-clustered SE; controls log float market cap and formation-month return"
+formation_month_return,-0.04580631889174014,0.01585843933026672,-2.8884506184865377,0.0038714481190615063,622100,197,"POST-HOC: month-FE pooled OLS, month-clustered SE; controls log float market cap and formation-month return"

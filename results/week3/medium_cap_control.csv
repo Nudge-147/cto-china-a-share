@@ -1,0 +1,4 @@
+period,universe,months,ew_d10_minus_d1,newey_west_t_lag5
+full_2010_2026,exclude_bottom_30pct_market_cap,198,0.016528902122648837,7.293219553339
+paper_overlap_2010_2020,exclude_bottom_30pct_market_cap,131,0.01578649815628343,6.118107558745373
+out_of_sample_2021_2026,exclude_bottom_30pct_market_cap,67,0.017980468086736427,4.005869376304438

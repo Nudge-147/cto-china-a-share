@@ -1,0 +1,5 @@
+series,stock_label,months,mean_monthly_return,newey_west_t_lag5
+attention_Q5-Q1,attention,186,0.010368963771124883,3.4097303480377947
+baseline_Q5-Q1,baseline,198,0.010377790384793457,7.030330223805599
+information_Q5-Q1,information,168,0.0028675033506842763,0.5260448020111634
+attention_minus_information_Q5-Q1,contrast,168,0.006930630902600913,1.3272748108594812

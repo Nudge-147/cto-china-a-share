@@ -1,0 +1,4 @@
+stock_label,stock_months,stocks,first_month,last_month,share_of_stock_months
+attention,77265,5319,2011-01,2026-07,0.12289625752146091
+baseline,533067,5390,2010-01,2026-07,0.847886356153402
+information,18369,4528,2011-01,2026-07,0.029217386325137068

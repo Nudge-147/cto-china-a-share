@@ -1,0 +1,3 @@
+period,ipo_filter,months,ew_d10_minus_d1,newey_west_t_lag5
+full_2010_2026,first_day_only,198,0.02564088660948055,5.777604802007711
+paper_overlap_2010_2020,first_day_only,131,0.029801920246812677,4.781695095321298

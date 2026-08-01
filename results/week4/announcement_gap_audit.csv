@@ -1,0 +1,8 @@
+event_type,report_date,status,event_rows,potentially_affected_stock_months,note
+dividend,20100331,confirmed_zero_events,0,0,provider returned an explicit empty period
+dividend,20100930,confirmed_zero_events,0,0,provider returned an explicit empty period
+dividend,20110331,confirmed_zero_events,0,0,provider returned an explicit empty period
+dividend,20110930,confirmed_zero_events,0,0,provider returned an explicit empty period
+dividend,20120331,confirmed_zero_events,0,0,provider returned an explicit empty period
+dividend,20140331,confirmed_zero_events,0,0,provider returned an explicit empty period
+dividend,20150331,confirmed_zero_events,0,0,provider returned an explicit empty period

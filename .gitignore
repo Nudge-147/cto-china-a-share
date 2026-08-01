@@ -1,0 +1,16 @@
+# Rebuildable vendor data and intermediate outputs
+/data/
+/tmp/
+
+# Local environments and Python caches
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Machine-specific / non-public artifacts
+*.plist
+ssrn-*.pdf
+/量化_开盘价学习项目/
+.DS_Store
