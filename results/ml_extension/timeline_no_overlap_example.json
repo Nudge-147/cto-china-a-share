@@ -1,0 +1,15 @@
+{
+  "code": "000001",
+  "latest_training_feature_month": "2012-12",
+  "latest_training_feature_start_date": "2012-12-03",
+  "latest_training_feature_end_date": "2012-12-31",
+  "latest_training_target_month": "2013-01",
+  "latest_training_target_end_date": "2013-01-31",
+  "prediction_formation_month": "2013-01",
+  "prediction_feature_start_date": "2013-01-04",
+  "prediction_feature_end_date": "2013-01-31",
+  "test_target_holding_month": "2013-02",
+  "test_target_return_start_date": "2013-01-31",
+  "test_target_return_end_date": "2013-02-28",
+  "assertion": "training holding_month <= formation_month < test holding_month"
+}

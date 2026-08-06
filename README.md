@@ -32,6 +32,10 @@ The paper-overlap, cost-and-tradability-adjusted EW return is only 0.25% per mon
 
 The low-CTO leg loses overnight and partially recovers intraday, consistent with a persistent “speculation magnet” state rather than one isolated event. See [`results/week3/overnight_intraday_decomposition.csv`](results/week3/overnight_intraday_decomposition.csv).
 
+### Fixed nonlinear extension
+
+An expanding-window comparison asks whether the formation month's daily return sequence adds information beyond mean CTO, and whether that increment is nonlinear. A five-feature CTO-family Ridge raises mean IC from 0.040 to 0.077, but its out-of-sample long-short return is almost unchanged; the much larger eight-feature Ridge return is mainly associated with added size, turnover, and cumulative-return exposures. Fixed-parameter LightGBM underperforms the full Ridge (2.48% vs. 2.72% gross per month) and turns over more. See the [extension analysis](results/ml_extension/ML_EXTENSION_ANALYSIS.md).
+
 ## Data and method
 
 - **Price source:** Baostock daily A-share history, 2010-01-01 to 2026-07-22. Post-adjusted prices construct returns; unadjusted prices perform exchange-price-limit checks. The same vendor is used for both price series.
@@ -51,6 +55,8 @@ source .venv/bin/activate
 pip install -r requirements.txt
 python -m unittest discover -s tests -v
 ```
+
+On macOS, LightGBM also needs an OpenMP runtime (for example, `brew install libomp`).
 
 The unit tests and inspection of included `results/` complete in a few minutes. Full raw-data reconstruction is slower because free Baostock/Eastmoney endpoints are rate-limited.
 
@@ -84,6 +90,9 @@ python src/download_disclosure_events.py --start-year 2010 --end-year 2026
 bash src/run_week4_label_pipeline.sh
 python src/run_week4_2d_backtest.py
 python src/run_week4_power_posthoc.py
+
+# 6. Fixed eight-feature linear-versus-nonlinear extension
+python src/ml_extension.py
 ```
 
 Expected elapsed time: price download roughly 8–12 hours with two shards (endpoint-dependent); disclosure download roughly 1–3 hours; all local construction/backtests several hours on a modern laptop. The scripts are checkpointed where remote retrieval is involved.
@@ -117,7 +126,7 @@ The resulting Q1 comparison is informative: attention-type, low-CTO stocks have 
 
 ```text
 src/       Downloaders, signal construction, backtests, audits, and extensions
-tests/     Unit tests for price-limit rules, ST/trading status, and share smoothing
+tests/     Unit tests for filters, timing alignment, costs, and feature processing
 docs/      Research design, audit notes, pre-registration, and result interpretation
 results/   Versioned figures and compact CSV result tables; no raw daily histories
 ```

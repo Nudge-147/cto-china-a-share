@@ -1,0 +1,25 @@
+{
+  "main_stock_months": 628701,
+  "complete_feature_stock_months": 627447,
+  "complete_feature_and_target_stock_months": 622394,
+  "prediction_stock_months_after_36_month_warmup": 560090,
+  "first_prediction_formation_month": "2013-01",
+  "last_prediction_formation_month": "2026-06",
+  "lightgbm_hyperparameters": {
+    "num_leaves": 31,
+    "max_depth": 5,
+    "learning_rate": 0.05,
+    "n_estimators": 300,
+    "min_child_samples": 50,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "random_state": 42
+  },
+  "hyperparameter_policy": "Prespecified to avoid in-sample tuning bias; no grid search was performed.",
+  "models": {
+    "cto_sort": "CTO sort",
+    "ridge_cto_family": "Ridge: CTO family (1-5)",
+    "ridge": "Ridge: all 8 features",
+    "lightgbm": "LightGBM: all 8 features"
+  }
+}
