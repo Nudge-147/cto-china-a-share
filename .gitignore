@@ -1,19 +1,15 @@
 # Rebuildable vendor data and intermediate outputs
 /data/
 /tmp/
-/kaggle_stage3_bundle.zip
-/kaggle_stage3_baseline_report.zip
 
 # Local environments and Python caches
 .venv/
-.venv-5min/
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .mypy_cache/
 
 # Machine-specific / non-public artifacts
-kaggle.json
 *.plist
 ssrn-*.pdf
 /量化_开盘价学习项目/

@@ -45,17 +45,6 @@ An expanding-window comparison asks whether the formation month's daily return s
 - **Portfolio test:** at each month end, sort stocks into CTO deciles; hold next month; report EW and float-market-cap VW returns. Long–short is D10 minus D1. Newey–West uses five lags, matching the paper.
 - **Market-cap weight:** inferred float shares use `volume / turnover`, invalid `turn < 0.01%` observations are forward-filled, then shares are 20-day-median smoothed with a 5% step threshold.
 
-### Daily-price lineage note
-
-The files under `data/cto_baostock/daily_raw/` are usually reconstructed from
-Baostock post-adjusted OHLC divided by the vendor's back-adjustment factor. Some
-therefore retain `adjustflag=1` even though their price levels are reconstructed
-to raw levels. This has negligible impact on the CTO return construction, but it
-means those files are not treated as native unadjusted observations for the new
-five-minute reconciliation pipeline. That pipeline downloads a separate native
-`adjustflag=3` daily companion table for every selected stock. See
-[`DATA_NOTES.md`](DATA_NOTES.md), DN-005.
-
 ## Reproduction
 
 ### Environment
@@ -66,17 +55,6 @@ source .venv/bin/activate
 pip install -r requirements.txt
 python -m unittest discover -s tests -v
 ```
-
-For a compact cold-start gate after cloning, run the same environment setup and then:
-
-```bash
-bash scripts/cold_start_smoke.sh .venv/bin/python
-```
-
-This checks dependency imports, compiles all source files, opens the principal CLI entry points,
-and runs the complete unit-test suite without downloading vendor data. The Stage-4 final figures
-additionally require the locally archived V17 Dataset and are regenerated with
-`python finalize_stage4.py`; cloud-only artifacts are not treated as the primary copy.
 
 On macOS, LightGBM also needs an OpenMP runtime (for example, `brew install libomp`).
 
@@ -118,139 +96,6 @@ python src/ml_extension.py
 ```
 
 Expected elapsed time: price download roughly 8–12 hours with two shards (endpoint-dependent); disclosure download roughly 1–3 hours; all local construction/backtests several hours on a modern laptop. The scripts are checkpointed where remote retrieval is involved.
-
-### Five-minute pilot pipeline
-
-The pilot universe is selected mechanically by average daily traded amount from
-2024 onward. The same rule is intended for the later 1,500-stock expansion.
-
-```bash
-pip install -r requirements-5min.txt
-
-# Rebuild the top-100 code-only universe from CTO daily files
-python build_stock_list.py
-
-# Conservative two-session download; each process logs in independently
-python download_5min.py --limit 10 --workers 2
-
-# Three-layer QC, CSV details, and five diagnostic figures
-python quality_check.py --limit 10
-```
-
-Minute data are requested by natural year and first saved as
-`data/raw_5min/segments/{code}_{year}.parquet`. Historical completed segments are
-checkpointed in `progress.json`; the current year is refreshed on every run.
-After all requested segments finish, each stock is merged once into
-`data/raw_5min/{code}.parquet`. Direct unadjusted daily companion tables are in
-`data/daily_reference_unadjusted/`, and QC output is in `data/qc_report/`.
-
-The exact 48 timestamps, the 2019 coverage gap, reconciliation evidence, and the
-unresolved high/low vendor difference are documented in
-[`DATA_NOTES.md`](DATA_NOTES.md). Comments beside QC assertions reference those
-note identifiers.
-
-The first 10-stock end-to-end run found no OHLC, duplicate, negative-value,
-invalid-time, or missing-bar assertion failures across 14,326 covered stock-days.
-It did find a vendor reconciliation regime concentrated in 2023–2025: daily and
-five-minute volume/amount, and occasionally the final close, do not always match
-even though every covered day has all 48 bars. These observations remain strict
-QC exceptions rather than being silently tolerated; both exact issue lists and
-relative-error quantiles are retained.
-
-The 10-stock gate investigation rejected post-market fixed-price and block trades
-as the main explanation: they explain only 2.23% of 5,203 volume-mismatch days,
-while 75.03% of gaps have the opposite sign required by that hypothesis. An
-independent Sina daily feed agrees with Baostock daily volume on every compared
-day in 2023–2026, and non-STAR minute volumes switch to exact 100-share granularity
-throughout 2024–2025. This evidence localizes the unresolved regime to Baostock's
-historical minute archive. Scaling from 10 to 100 stocks was therefore frozen pending repair; see
-[`docs/RECONCILIATION_INVESTIGATION.md`](docs/RECONCILIATION_INVESTIGATION.md) and
-DN-007/008 in [`DATA_NOTES.md`](DATA_NOTES.md). The follow-up materiality test
-rejects a single round-lot-noise explanation for the main regime: the 2024 median
-absolute volume gap is 215,292 shares versus a 2,400-share theoretical rounding
-bound. It does not mandate a full pipeline migration; a 2024-capable second-source
-sample or a validated affected-period repair is the next gate.
-
-That gate is now resolved by DN-009. The known CTO adjustment factor does not
-explain the minute-volume ratios, although daily volume and amount ratios move
-almost identically. Raw files remain immutable. `repair_5min.py` creates
-research-ready files in `data/processed_5min/`, proportionally allocates each
-daily reference volume to integer 5-minute shares, preserves `volume_raw`, and
-adds `volume_rescaled`, `volume_scale_factor`, and `close_anomaly_flag`. The
-10-stock repaired sample reconciles daily volume with zero residual days, so the
-100-stock pilot gate is open.
-
-```bash
-# After downloading any stock prefix, build the research-ready layer
-python repair_5min.py --limit 100
-
-# QC the processed layer; price work must honor close_anomaly_flag
-python quality_check.py --limit 100 --raw-dir data/processed_5min \
-  --output-dir data/qc_report/processed_100
-```
-
-### Five-minute features and baselines
-
-The research layer keeps feature values unstandardized and uses only the current
-bar and prior history. Cross-sectional labels require at least 30 eligible
-stocks. Each sequence contains 48 bars and nine numeric features plus a
-sample-relative `is_cross_day` flag.
-
-```bash
-# Build per-bar causal features and same-day forward labels
-python features_5min.py
-
-# Build compressed sequence arrays and flat LightGBM/Ridge snapshots
-python build_5min_dataset.py
-
-# Run purged 2y/3m/6m rolling baselines in the isolated arm64 environment
-MPLCONFIGDIR=/tmp/mpl-5min .venv-5min/bin/python run_baseline.py
-
-# Re-check whether the 10-stock archive regimes generalize to the expanded pool
-python validate_regime_100.py
-```
-
-The requested 14:35 sampling point is intentionally retained for sequence and
-60-minute-label use. Under the separately requested rule that the 30-minute
-target may not cross the close, however, 14:35 is one of the final six bars and
-therefore has no `fwd_ret_30m` or `label_rank`; the 30-minute baseline uses the
-other five daily sampling points. This eligibility loss is explicit in
-`data/dataset/flat/dataset_manifest.csv` rather than silently changing either
-specification.
-
-The completed 100-stock build contains 866,208 sequence/flat samples, of which
-711,780 have an eligible cross-sectional rank label. All eight rolling training
-windows contain about 210k observations, below the requested 500k warning level,
-and are explicitly flagged. The canonical same-close target produces mean test
-RankIC of 0.1016 for LightGBM and 0.0912 for Ridge. A leakage/execution audit
-finds that this is dominated by very short-horizon reversal and an optimistic
-same-close execution convention: entering one bar later reduces mean RankIC to
-0.0397 and 0.0297. Both values are reported; strategy claims should use the
-delayed-entry sensitivity. See DN-011 and `data/baseline_report/`.
-
-Stage three adds `run_neural_models.py`: a two-layer 128-unit BatchNorm/Dropout MLP on the exact
-baseline snapshots and a one-layer hidden-64 GRU on the 48-bar sequence. Window-one CPU smoke tests
-completed without an overfit alert. The provisional delayed RankIC values are 0.0211 for MLP and
-0.0344 for GRU versus 0.0263 for LightGBM. Five-seed claims remain gated; use the interruption-safe
-Kaggle command in [`KAGGLE_STAGE3.md`](KAGGLE_STAGE3.md). See DN-012 and
-[`docs/checkpoints/STAGE3_CHECKPOINT.md`](docs/checkpoints/STAGE3_CHECKPOINT.md).
-
-### Stage-four finalization
-
-Stage four freezes the five-seed GRU attribution, failed-window comparison, execution-timing
-appendix, and transaction-cost layer. No model fitting is required for the final publication pack:
-
-```bash
-MPLCONFIGDIR=/tmp/mpl-stage4-final .venv-5min/bin/python finalize_stage4.py
-```
-
-The command reads the verified local V17 primary copy under `data/archive/`, writes the exact source
-tables to [`docs/tables/`](docs/tables/), and writes the unified 220-DPI figures to
-[`docs/figures/`](docs/figures/). Window 2/8 interpretation is in
-[`docs/STAGE4_WINDOW_2_8_ANALYSIS.md`](docs/STAGE4_WINDOW_2_8_ANALYSIS.md); the same-close versus
-one-bar-delayed comparison is in
-[`docs/APPENDIX_A_EXECUTION_PROTOCOLS.md`](docs/APPENDIX_A_EXECUTION_PROTOCOLS.md). Research and
-engineering provenance is archived in [`docs/checkpoints/`](docs/checkpoints/).
 
 ## Data-quality controls
 
